@@ -1,0 +1,93 @@
+<?php
+
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+
+new #[Layout('components.layouts.auth')] class extends Component {};
+?>
+
+<div class="flex min-h-screen flex-col justify-center px-6 py-12 sm:px-8">
+    <div class="mx-auto w-full max-w-md">
+        <a href="{{ route('home') }}" class="text-sm font-semibold tracking-wide text-indigo-600">
+            FOLIO CMS
+        </a>
+
+        <h1 class="mt-8 text-3xl font-semibold tracking-tight text-gray-900">
+            Reset your password
+        </h1>
+
+        <p class="mt-2 text-sm leading-6 text-gray-600">
+            Choose a new password for your account.
+        </p>
+
+        <div class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-md sm:p-8">
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-5">
+                @csrf
+
+                <input type="hidden" name="token" value="{{ request()->route('token') }}">
+
+                <div>
+                    <label for="email" class="mb-2 block text-sm font-medium text-gray-700">
+                        Email address
+                    </label>
+
+                    <input id="email" name="email" type="email"
+                        value="{{ old('email', request()->query('email')) }}" autocomplete="email" required autofocus
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="you@example.com"
+                        @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
+
+                    @error('email')
+                        <p id="email-error" class="mt-2 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password" class="mb-2 block text-sm font-medium text-gray-700">
+                        New password
+                    </label>
+
+                    <input id="password" name="password" type="password" autocomplete="new-password" required
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="Enter a new password"
+                        @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
+
+                    @error('password')
+                        <p id="password-error" class="mt-2 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password_confirmation" class="mb-2 block text-sm font-medium text-gray-700">
+                        Confirm new password
+                    </label>
+
+                    <input id="password_confirmation" name="password_confirmation" type="password"
+                        autocomplete="new-password" required
+                        class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        placeholder="Repeat your new password">
+                </div>
+
+                <button type="submit"
+                    class="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Reset password
+                </button>
+            </form>
+        </div>
+
+        <p class="mt-6 text-center text-sm text-gray-600">
+            Remember your password?
+            <a href="{{ route('login') }}" class="font-semibold text-indigo-600 transition hover:text-indigo-500">
+                Back to sign in
+            </a>
+        </p>
+
+        <p class="mt-10 text-center text-xs text-gray-500">
+            &copy; {{ date('Y') }} Folio CMS
+        </p>
+    </div>
+</div>

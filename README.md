@@ -2,13 +2,20 @@
 
 **A block-based content management system for building and publishing portfolio pages and case studies.**
 
-Folio CMS is a Laravel-based CMS project focused on structured content creation, editorial review, and controlled publishing. It is being built with a clear separation between public-facing content and an authenticated administration area.
+Folio CMS is a Laravel-based content management system focused on structured content creation, editorial review, and controlled publishing. It separates the public-facing website from the authenticated administration area, with role-based permissions governing content management and publication.
 
-The goal is to provide a maintainable foundation for creating rich portfolio pages while keeping content workflows, permissions, and presentation organized.
+## Features
 
-## Project Status
-
-**In active development.** The initial application foundation and core dependencies are configured. Content management, editorial workflows, and public page rendering are planned for subsequent development.
+- **Block-based content:** Build pages using hero, text, gallery, and call-to-action blocks.
+- **Editorial workflow:** Create drafts, submit them for review, request changes, and publish approved content.
+- **Role-based access control:** Separate administrator and contributor responsibilities using Spatie Laravel Permission.
+- **Authorization and ownership:** Enforce permissions for page creation, editing, review, publication, and deletion.
+- **Public portfolio pages:** Render published pages using slug-based URLs without requiring visitors to sign in.
+- **Navigation control:** Choose which published pages appear in the public navigation.
+- **SEO metadata:** Configure page titles and meta descriptions, with a fallback to the page title.
+- **Media uploads:** Upload and display gallery images with alternative text.
+- **Authentication:** Provide registration, login, email verification, and password reset through Laravel Fortify.
+- **Automated tests:** Test page validation, authorization, editorial workflows, authentication, and public rendering.
 
 ## Tech Stack
 
@@ -22,18 +29,23 @@ The goal is to provide a maintainable foundation for creating rich portfolio pag
 - **Testing:** Pest
 - **Asset bundling:** Vite
 
-## Planned Features
+## Roles and Publishing Workflow
 
-- **Block-based content:** Compose pages from reusable content blocks, including hero sections, text, galleries, and calls to action.
-- **Editorial workflow:** Support draft, pending review, and published content states.
-- **Role-based access control:** Separate administrator responsibilities from contributor permissions.
-- **Review and publishing:** Allow contributors to submit content for review while reserving publishing permissions for authorized administrators.
-- **Public pages:** Render published content through clean, slug-based URLs.
-- **Navigation control:** Include only explicitly selected pages in public navigation.
-- **Metadata management:** Support page titles, descriptions, and search-engine metadata.
-- **Media management:** Support cover images and uploaded content assets.
+### Admin
 
-These features describe the intended direction of the project and are not all implemented yet.
+Administrators can manage pages across contributors, review submitted content, publish approved pages, return pages for changes, and manage content according to their assigned permissions.
+
+### Contributor
+
+Contributors can create pages, edit their own eligible pages, and submit drafts for review. They cannot publish pages directly or edit content when their permissions and the page status prohibit it.
+
+### Page lifecycle
+
+1. A contributor creates a draft.
+2. The contributor edits the draft and submits it for review.
+3. An authorized reviewer approves the submission or returns it for changes.
+4. An authorized administrator publishes the approved page.
+5. Published pages become publicly accessible when their publication time has arrived.
 
 ## Development Setup
 
@@ -64,16 +76,24 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Configure the database connection in `.env`, then run the migrations:
+Configure the database connection in `.env`, ensuring that the MySQL database exists and the credentials are correct.
+
+Run the database migrations and seed the required roles and permissions:
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
 
 Build the frontend assets:
 
 ```bash
 npm run build
+```
+
+Configure the web server or local development environment to serve the application. For a standard Laravel development server, run:
+
+```bash
+php artisan serve
 ```
 
 ### Running Tests
@@ -84,16 +104,16 @@ Run the automated test suite with:
 php artisan test
 ```
 
-## Architecture Goals
+## Architecture
 
-Folio CMS is being developed with an emphasis on:
+The project emphasizes:
 
-- Clear separation of responsibilities
-- Explicit authorization and ownership checks
-- Reusable content blocks with controlled rendering
-- Testable application behavior
-- Secure defaults for authentication and publishing
-- A maintainable Laravel and Livewire codebase
+- Separation of application actions, validation, authorization, and presentation
+- Explicit page ownership and permission checks
+- Structured content blocks with controlled rendering
+- Separate public-facing pages and authenticated administration
+- Testable editorial workflows and secure publishing rules
+- Laravel conventions and maintainable Livewire and Filament components
 
 ## License
 
