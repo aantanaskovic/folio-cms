@@ -55,7 +55,7 @@ Install a compatible PHP version and Composer, Node.js and npm, and a MySQL serv
 1. Clone the repository and enter the project directory:
 
     ```bash
-    git clone <REPOSITORY_URL>
+    git clone https://github.com/aantanaskovic/folio-cms.git
     cd folio-cms
     ```
 
