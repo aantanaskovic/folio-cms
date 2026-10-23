@@ -3,33 +3,13 @@
 use App\Enums\PageStatus;
 use App\Models\Page;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Filament\Facades\Filament;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
-    Role::create([
-        'name' => 'admin',
-        'guard_name' => 'web',
-    ]);
-
-    Role::create([
-        'name' => 'contributor',
-        'guard_name' => 'web',
-    ]);
-
-    Permission::create([
-        'name' => 'pages.view',
-        'guard_name' => 'web',
-    ]);
-
-    Permission::create([
-        'name' => 'pages.update',
-        'guard_name' => 'web',
-    ]);
-
-    Role::findByName('contributor')->givePermissionTo('pages.view');
-    Role::findByName('contributor')->givePermissionTo('pages.update');
+    $this->seed(RolePermissionSeeder::class);
 });
 
 it('allows an admin to access the Filament panel', function () {
@@ -297,4 +277,69 @@ it('denies a contributor direct access to edit another contributors pending page
     $this->actingAs($contributor)
         ->get("/admin/pages/{$page->id}/edit")
         ->assertForbidden();
+});
+
+it('provides navigation links to the dashboard and public website in the admin user menu', function () {
+    $admin = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    $admin->assignRole('admin');
+
+    $this->actingAs($admin)
+        ->get('/admin')
+        ->assertOk()
+        ->assertSee('Dashboard')
+        ->assertSee(route('dashboard'), false)
+        ->assertSee('View website')
+        ->assertSee(route('home'), false);
+});
+
+it('allows panel access based on the administration permission without a specific role', function () {
+    $role = Role::create([
+        'name' => 'reviewer',
+        'guard_name' => 'web',
+    ]);
+
+    $role->givePermissionTo('pages.administration');
+
+    $user = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    $user->assignRole($role);
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeTrue();
+
+    $this->actingAs($user)
+        ->get('/admin')
+        ->assertOk();
+});
+
+it('denies panel access to a user whose role has no administration permission', function () {
+    $role = Role::create([
+        'name' => 'restricted',
+        'guard_name' => 'web',
+    ]);
+
+    $user = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    $user->assignRole($role);
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
+
+    $this->actingAs($user)
+        ->get('/admin')
+        ->assertForbidden();
+});
+
+it('does not grant user administration access to a contributor', function () {
+    $contributor = User::factory()->create();
+
+    $contributor->assignRole('contributor');
+
+    expect($contributor->can('pages.administration'))->toBeTrue()
+        ->and($contributor->can('users.administration'))->toBeFalse();
 });

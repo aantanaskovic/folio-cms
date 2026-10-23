@@ -15,15 +15,16 @@ class PagePolicy
 
     public function view(User $user, Page $page): bool
     {
+        if (! $user->can('pages.view')) {
+            return false;
+        }
+
         if ($page->status === PageStatus::Published) {
             return true;
         }
 
-        return $user->can('pages.view')
-            && (
-                $user->can('pages.review')
-                || $page->author_id === $user->id
-            );
+        return $user->can('pages.review')
+            || $page->author_id === $user->id;
     }
 
     public function create(User $user): bool

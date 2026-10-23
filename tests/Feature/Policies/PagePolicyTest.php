@@ -96,3 +96,14 @@ it('denies page management to users without the required permissions', function 
         ->and($user->can('review', $page))->toBeFalse()
         ->and($user->can('publish', $page))->toBeFalse();
 });
+
+it('does not allow a user without page view permission to view a published page in the admin panel', function () {
+    $user = User::factory()->create();
+
+    $page = Page::factory()->create([
+        'status' => PageStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    expect($user->can('view', $page))->toBeFalse();
+});

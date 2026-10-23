@@ -179,7 +179,7 @@ it('does not render unknown content block types', function () {
 it('renders an uploaded gallery image with its alt text', function () {
     Storage::fake('public');
 
-    $imagePath = 'gallery/project-one.jpg';
+    $imagePath = 'project-one.jpg';
 
     Storage::disk('public')->put($imagePath, 'fake image contents');
 

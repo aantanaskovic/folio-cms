@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,6 +30,16 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->emailVerification()
+            ->userMenuItems([
+                Action::make('dashboard')
+                    ->label('Dashboard')
+                    ->url(fn(): string => route('dashboard')),
+
+                Action::make('viewWebsite')
+                    ->label('View website')
+                    ->url(fn(): string => route('home'))
+                    ->openUrlInNewTab(),
+            ])
             ->colors([
                 'primary' => Color::Amber,
             ])

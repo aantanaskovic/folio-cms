@@ -14,6 +14,8 @@ class RolePermissionSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permissions = [
+            'users.administration',
+            'pages.administration',
             'pages.view',
             'pages.create',
             'pages.update',
@@ -38,19 +40,24 @@ class RolePermissionSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
+        if ($admin->wasRecentlyCreated) {
+            $admin->syncPermissions($permissions);
+        }
+
         $contributor = Role::firstOrCreate([
             'name' => 'contributor',
             'guard_name' => 'web',
         ]);
 
-        $admin->syncPermissions($permissions);
-
-        $contributor->syncPermissions([
-            'pages.view',
-            'pages.create',
-            'pages.update',
-            'pages.submit-for-review',
-        ]);
+        if ($contributor->wasRecentlyCreated) {
+            $contributor->syncPermissions([
+                'pages.administration',
+                'pages.view',
+                'pages.create',
+                'pages.update',
+                'pages.submit-for-review',
+            ]);
+        }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

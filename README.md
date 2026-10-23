@@ -1,120 +1,159 @@
 # Folio CMS
 
-**A block-based content management system for building and publishing portfolio pages and case studies.**
+Folio CMS is a portfolio-focused content management system built with Laravel. It demonstrates structured page content, role-based access control, an editorial review workflow, and a public-facing website backed by a Filament administration panel.
 
-Folio CMS is a Laravel-based content management system focused on structured content creation, editorial review, and controlled publishing. It separates the public-facing website from the authenticated administration area, with role-based permissions governing content management and publication.
+This is a portfolio and learning project, not a claim of production readiness.
 
 ## Features
 
-- **Block-based content:** Build pages using hero, text, gallery, and call-to-action blocks.
-- **Editorial workflow:** Create drafts, submit them for review, request changes, and publish approved content.
-- **Role-based access control:** Separate administrator and contributor responsibilities using Spatie Laravel Permission.
-- **Authorization and ownership:** Enforce permissions for page creation, editing, review, publication, and deletion.
-- **Public portfolio pages:** Render published pages using slug-based URLs without requiring visitors to sign in.
-- **Navigation control:** Choose which published pages appear in the public navigation.
-- **SEO metadata:** Configure page titles and meta descriptions, with a fallback to the page title.
-- **Media uploads:** Upload and display gallery images with alternative text.
-- **Authentication:** Provide registration, login, email verification, and password reset through Laravel Fortify.
-- **Automated tests:** Test page validation, authorization, editorial workflows, authentication, and public rendering.
+- **Page management** — create and manage portfolio pages and case studies.
+- **Structured content blocks** — compose pages from supported blocks such as hero, text, gallery, and call to action.
+- **Editorial workflow** — contributors submit draft pages for review; authorized administrators review and publish them.
+- **Public website** — visitors can view published pages without signing in.
+- **Public navigation** — published pages can be included in the website navigation.
+- **User management** — administrators manage user accounts through the admin panel.
+- **Role and permission management** — roles and permissions control access to administration and content operations.
+- **Authentication** — custom authentication views backed by Laravel Fortify, including email verification and password reset flows.
+- **Authorization** — Laravel policies and application actions enforce access rules beyond simply hiding interface controls.
+- **Automated tests** — Pest tests cover key application behavior, content workflows, validation, and authorization.
 
-## Tech Stack
+## Roles and workflow
 
-- **Backend:** Laravel 13, PHP 8.4
-- **Interactive UI:** Livewire 4
-- **Administration panel:** Filament 5
-- **Authentication:** Laravel Fortify
-- **Authorization:** Spatie Laravel Permission
-- **Frontend styling:** Tailwind CSS 4
-- **Database:** MySQL
-- **Testing:** Pest
-- **Asset bundling:** Vite
+The default roles are `admin` and `contributor`.
 
-## Roles and Publishing Workflow
+- **Admin** — manages users and roles, reviews submitted pages, and publishes content.
+- **Contributor** — creates and manages their own eligible pages and submits drafts for review. Contributors cannot publish pages directly.
 
-### Admin
+The typical content workflow is:
 
-Administrators can manage pages across contributors, review submitted content, publish approved pages, return pages for changes, and manage content according to their assigned permissions.
+1. A contributor creates a draft page.
+2. The contributor submits the draft for review.
+3. An authorized administrator reviews and publishes the page.
+4. Published content is available on the public website.
 
-### Contributor
+The application intentionally keeps this workflow straightforward; it does not attempt to provide a full content-versioning or enterprise editorial system.
 
-Contributors can create pages, edit their own eligible pages, and submit drafts for review. They cannot publish pages directly or edit content when their permissions and the page status prohibit it.
+## Technology stack
 
-### Page lifecycle
-
-1. A contributor creates a draft.
-2. The contributor edits the draft and submits it for review.
-3. An authorized reviewer approves the submission or returns it for changes.
-4. An authorized administrator publishes the approved page.
-5. Published pages become publicly accessible when their publication time has arrived.
-
-## Development Setup
-
-### Requirements
-
-- PHP 8.4 or a compatible supported version
-- Composer
-- Node.js and npm
+- PHP 8.4
+- Laravel 13
+- Livewire 4
+- Filament 5
+- Laravel Fortify
+- Spatie Laravel Permission
+- Tailwind CSS 4
+- Vite
 - MySQL
-- A local PHP development environment such as Laravel Herd
+- Pest
 
-### Installation
+## Requirements
 
-Clone the repository and install the dependencies:
+Install a compatible PHP version and Composer, Node.js and npm, and a MySQL server. The exact PHP extensions required are determined by the Composer dependencies.
 
-```bash
-git clone <repository-url>
-cd folio-cms
+## Installation
 
-composer install
-npm install
-```
+1. Clone the repository and enter the project directory:
 
-Create the local environment file and generate an application key:
+    ```bash
+    git clone <REPOSITORY_URL>
+    cd folio-cms
+    ```
 
-```bash
-cp .env.example .env
-php artisan key:generate
-```
+2. Install PHP dependencies:
 
-Configure the database connection in `.env`, ensuring that the MySQL database exists and the credentials are correct.
+    ```bash
+    composer install
+    ```
 
-Run the database migrations and seed the required roles and permissions:
+3. Create your local environment file:
 
-```bash
-php artisan migrate --seed
-```
+    ```bash
+    cp .env.example .env
+    ```
 
-Build the frontend assets:
+    On Windows PowerShell:
 
-```bash
-npm run build
-```
+    ```powershell
+    Copy-Item .env.example .env
+    ```
 
-Configure the web server or local development environment to serve the application. For a standard Laravel development server, run:
+4. Generate the application key:
 
-```bash
-php artisan serve
-```
+    ```bash
+    php artisan key:generate
+    ```
 
-### Running Tests
+5. Create a MySQL database and update the `DB_*` settings in `.env` to match your local database. Review the other environment settings as needed.
 
-Run the automated test suite with:
+6. Install JavaScript dependencies:
+
+    ```bash
+    npm install
+    ```
+
+7. Run database migrations and seed the initial roles, permissions, and demo data:
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+8. Build the frontend assets:
+
+    ```bash
+    npm run build
+    ```
+
+9. Start the Laravel development server:
+
+    ```bash
+    php artisan serve
+    ```
+
+Open the local URL shown by Artisan. The Filament administration panel is available at `/admin`.
+
+For frontend development with Vite's development server, run `npm run dev` in a separate terminal instead of relying only on the production build.
+
+### Demo data
+
+The database seeder creates the initial role and permission setup and the project's demo records. Check the seeders under `database/seeders/` for the demo accounts and their local credentials. Use demo credentials only in a local development environment.
+
+> **Note:** Run seeders against a development database. Do not use demo accounts or development configuration for a public deployment.
+
+## Running tests
+
+Run the complete Pest test suite:
 
 ```bash
 php artisan test
 ```
 
-## Architecture
+## Project structure
 
-The project emphasizes:
+The application separates its main responsibilities into Laravel models, enums, policies, validators, and application actions, with Filament resources for administration and Blade views for public rendering.
 
-- Separation of application actions, validation, authorization, and presentation
-- Explicit page ownership and permission checks
-- Structured content blocks with controlled rendering
-- Separate public-facing pages and authenticated administration
-- Testable editorial workflows and secure publishing rules
-- Laravel conventions and maintainable Livewire and Filament components
+- `app/Actions/` — application operations and workflow actions
+- `app/Enums/` — domain enums, including page status
+- `app/Filament/` — administration resources and form/table schemas
+- `app/Models/` — Eloquent models
+- `app/Policies/` — record-level authorization
+- `app/Validators/` — structured page data validation
+- `database/seeders/` — roles, permissions, and demo data
+- `resources/views/` — public pages, layouts, navigation, and content-block rendering
+- `tests/` — Pest feature and unit tests
+
+## Project status
+
+The core portfolio demonstration is implemented: page management, public rendering, user management, role/permission management, authentication, editorial workflow, and automated tests.
+
+The project is kept intentionally focused. Additional production-specific work—such as deployment hardening, operational monitoring, and a more elaborate editorial/versioning system—is outside the current scope.
+
+## Security notes
+
+- Keep `.env` out of version control.
+- Never commit real passwords, API keys, tokens, or other secrets.
+- Use HTTPS and review environment, email, storage, and database configuration before deploying publicly.
+- Review all demo credentials and seeded records before exposing an instance to the internet.
 
 ## License
 
-No license has been selected yet. Until a license is added to the repository, all rights remain reserved by the copyright holder.
+No license has been specified. Add a license file if you intend to permit others to use, modify, or distribute this project.

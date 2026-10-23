@@ -253,3 +253,32 @@ it('allows disabling a page in public navigation', function () {
         'show_in_navigation' => false,
     ]);
 });
+
+it('updates the authors pending page', function () {
+    $user = User::factory()->create();
+    $user->assignRole('contributor');
+
+    $page = Page::factory()->for($user, 'author')->create([
+        'title' => 'Original Title',
+        'slug' => 'original-title',
+        'status' => PageStatus::Pending,
+        'published_at' => null,
+    ]);
+
+    $updatedPage = app(UpdatePage::class)->handle($user, $page, [
+        'title' => 'Updated Title',
+        'slug' => 'updated-title',
+        'blocks' => [
+            [
+                'type' => 'text',
+                'data' => ['content' => 'Updated content'],
+            ],
+        ],
+    ]);
+
+    expect($updatedPage->title)->toBe('Updated Title')
+        ->and($updatedPage->slug)->toBe('updated-title')
+        ->and($updatedPage->status)->toBe(PageStatus::Pending)
+        ->and($updatedPage->author_id)->toBe($user->id)
+        ->and($updatedPage->published_at)->toBeNull();
+});

@@ -157,3 +157,26 @@ it('displays published pages in alphabetical order', function () {
         'Zebra Portfolio',
     ]);
 });
+
+it('groups public page links inside a Pages dropdown', function () {
+    $page = Page::factory()->create([
+        'title' => 'My Portfolio',
+        'slug' => 'my-portfolio',
+        'status' => PageStatus::Published,
+        'published_at' => now()->subDay(),
+        'show_in_navigation' => true,
+    ]);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('<div', false)
+        ->assertSee('aria-haspopup="true"', false)
+        ->assertSee('Pages')
+        ->assertSee(route('pages.show', $page->slug), false);
+});
+
+it('does not render the Pages dropdown when no pages are available for navigation', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertDontSee('Pages');
+});

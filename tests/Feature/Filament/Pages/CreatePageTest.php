@@ -269,3 +269,27 @@ it('uploads and stores a gallery image when creating a page', function () {
 
     expect(Storage::disk('public')->exists($galleryImage['url']))->toBeTrue();
 });
+
+it('does not allow submitted data to override publication fields', function () {
+    $contributor = User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+
+    $contributor->assignRole('contributor');
+
+    Livewire::actingAs($contributor)
+        ->test(CreatePage::class)
+        ->fillForm(validPageFormData([
+            'status' => PageStatus::Published->value,
+            'published_at' => now()->toDateTimeString(),
+        ]))
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $page = Page::query()
+        ->where('slug', 'my-portfolio-project')
+        ->firstOrFail();
+
+    expect($page->status)->toBe(PageStatus::Draft)
+        ->and($page->published_at)->toBeNull();
+});
